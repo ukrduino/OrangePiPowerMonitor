@@ -1,14 +1,14 @@
-int status = 0; // 0 - off, 1 - startUp delay(5min), 2 - booting(45s), 3 - working, 4 - powerOf delay(30s), 5 - shutting down(30s), 
+int status = 0; // 0 - off, 1 - startUp delay(3min), 2 - booting(30s), 3 - working, 4 - powerOf delay(30s), 5 - shutting down(30s), 
 bool mainPowerOn = true;
 int MAIN_POWER_PIN = 2;
 int RELAY_PIN = 3;
 int SHUTDOWN_PIN = 4;
 
 unsigned long startUpDelayBegin = 0;
-unsigned long startUpDelay = 300000;
+unsigned long startUpDelay = 180000;
 
 unsigned long bootDelayBegin = 0;
-unsigned long bootDelay = 45000;
+unsigned long bootDelay = 30000;
 
 unsigned long powerOffDelayBegin = 0;
 unsigned long powerOffDelay = 30000;
@@ -22,8 +22,10 @@ void setup()
 	Serial.begin(115200);
 	pinMode(RELAY_PIN, OUTPUT);
 	pinMode(SHUTDOWN_PIN, OUTPUT);
+	digitalWrite(SHUTDOWN_PIN, LOW);
 	pinMode(MAIN_POWER_PIN, INPUT);
 	Serial.println(status);
+	Serial.println("Starting");
 }
 
 void loop()
@@ -40,6 +42,7 @@ void loop()
 		long now = millis();
 		if (now - startUpDelayBegin > startUpDelay) {
 			digitalWrite(RELAY_PIN, HIGH);
+			digitalWrite(SHUTDOWN_PIN, LOW);
 			bootDelayBegin = millis();
 			status = 2;
 		}
@@ -70,9 +73,10 @@ void loop()
 			status = 5;
 		}
 	}
-	else if (!mainPowerOn && status == 5) {
+	else if (status == 5) {
 		long now = millis();
 		if (now - shutDownDelayBegin > shutDownDelay) {
+			digitalWrite(SHUTDOWN_PIN, LOW);
 			digitalWrite(RELAY_PIN, LOW);
 			status = 0;
 		}
