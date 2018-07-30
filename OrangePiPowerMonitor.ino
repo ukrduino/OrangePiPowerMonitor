@@ -4,7 +4,6 @@
 #include <SoftwareSerial.h>
 #include <LiquidCrystal_I2C.h>
 
-//LiquidCrystal_I2C lcd(0x3F, 16, 2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 SoftwareSerial mySerial(8, 7); // RX, TX
 Adafruit_BME280 bme; // I2C - Change sensor address in  I2C, 0x76 or 0x77, in Adafruit_BME280.h (http://playground.arduino.cc/Main/I2cScanner)
 
@@ -16,11 +15,6 @@ bool mainPowerOn = true;
 int MAIN_POWER_PIN = 5;
 int RELAY_PIN = 6;
 int SHUTDOWN_PIN = 4;
-
-//// Serial communication
-//String Serial_Command; // String input from command prompt
-//String temp1, temp2; // temporary strings
-//char inByte; // Byte input from command prompt
 
 unsigned long startUpDelayBegin = 0;
 unsigned long startUpDelay = 180000;
@@ -47,11 +41,6 @@ void setup()
 	if (!bme.begin()) {
 		Serial.println("Could not find a valid BME280 sensor, check wiring!");
 	}
-	//lcd.init();// initialize the lcd 
-	//lcd.clear();
-	//lcd.backlight();
-	//lcd.setCursor(3, 0); //position, line
-	//lcd.print("Hello, world!");
 }
 
 void loop()
@@ -113,54 +102,16 @@ void loop()
 	}
 	delay(1000);
 	//Serial.println(status);
-	/*lcd.setCursor(8, 1);
-	lcd.print(status);*/
-	//mySerial.println("BME280_test|28|55|1005.00|");
 	sendTempHumidPressureToOPI();
-	//getInfoFromOPI();
 }
-
-//void getInfoFromOPI() {
-//	// Fetch commands from serial port if there are any
-//	if (mySerial.available() > 0) {
-//		inByte = mySerial.read();
-//		// only input if a letter, number, =,?,+,< ,> are typed!
-//		if ((inByte >= 'A' && inByte <= 'Z') ||
-//			(inByte >= 'a' && inByte <= 'z') ||
-//			(inByte >= '0' && inByte <= '9') ||
-//			inByte == ',' || inByte == '!' || inByte == '.' ||
-//			inByte == ';' || inByte == ':' ||
-//				inByte == '?')
-//		{
-//			Serial_Command.concat(inByte);
-//		}
-//		if (inByte == '|') { // key on > character as end of command
-//							//Serial.println("");
-//			inByte = 0;
-//			// Respond to a command... more code would be here to process command
-//			Serial.println(Serial_Command);
-//			lcd.setCursor(0, 0);
-//			lcd.print(Serial_Command);
-//		}
-//	}
-//}
 
 void sendTempHumidPressureToOPI() {
 	long now = millis();
 	if (now - lastSensorDataMsg > sensorRequestPeriod) {
 		lastSensorDataMsg = now;
 		String temp = String(bme.readTemperature(), 0);
-		/*Serial.print("Temperature = ");
-		Serial.print(temp);
-		Serial.println(" *C");*/
 		String pressure = String(bme.readPressure() / 100.0F, 0);
-		/*Serial.print("Pressure = ");
-		Serial.print(pressure);
-		Serial.println(" hPa");*/
 		String humidity = String(bme.readHumidity(), 0);
-		/*Serial.print("Humidity = ");
-		Serial.print(humidity);
-		Serial.println(" %");*/
 		mySerial.print("BME280|");
 		mySerial.print(temp);
 		mySerial.print("|");
