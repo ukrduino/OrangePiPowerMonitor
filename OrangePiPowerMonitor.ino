@@ -40,7 +40,6 @@ void setup()
 	delay(1000);
 	if (!bme.begin()) {
 		Serial.println("Could not find a valid BME280 sensor, check wiring!");
-		mySerial.println("Could not find a valid BME280 sensor, check wiring!");
 	}
 }
 
@@ -101,7 +100,7 @@ void loop()
 			status = 0;
 		}
 	}
-	delay(1000);
+	//delay(1000);
 	//Serial.println(status);
 	sendTempHumidPressureToOPI();
 }
@@ -110,20 +109,24 @@ void sendTempHumidPressureToOPI() {
 	long now = millis();
 	if (now - lastSensorDataMsg > sensorRequestPeriod) {
 		lastSensorDataMsg = now;
-		String temp = String(bme.readTemperature(), 0);
-		String pressure = String(bme.readPressure() / 100.0F, 0);
-		String humidity = String(bme.readHumidity(), 0);
+		float temp = bme.readTemperature();
+		delay(1000);
+		float pressure = bme.readPressure() / 100.0F;
+		delay(1000);
+		float humidity = bme.readHumidity();
 		Serial.print("BME280|");
 		Serial.print(temp);
 		Serial.print("|");
 		Serial.print(pressure);
 		Serial.print("|");
-		Serial.println(humidity);
+		Serial.print(humidity);
+		Serial.println("|");
 		mySerial.print("BME280|");
 		mySerial.print(temp);
 		mySerial.print("|");
 		mySerial.print(pressure);
 		mySerial.print("|");
-		mySerial.println(humidity); 
+		mySerial.print(humidity);
+		mySerial.println("|");
 	}
 }
